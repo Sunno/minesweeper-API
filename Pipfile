@@ -8,6 +8,8 @@ fastapi = "*"
 uvicorn = {extras = ["standard"], version = "*"}
 
 [dev-packages]
+jedi = "*"
+flake8 = "*"
 
 [requires]
 python_version = "3.8"

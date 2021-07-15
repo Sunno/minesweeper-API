@@ -1,6 +1,11 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, status, Depends
+from sqlalchemy.orm import Session
+
+from models import Base, Board
+from database import engine, get_db
 
 app = FastAPI()
+Base.metadata.create_all(engine)
 
 
 @app.get('/')
@@ -13,13 +18,17 @@ def index():
     }
 
 
-@app.post('/init')
-def new_game():
+@app.post('/init', status_code=status.HTTP_201_CREATED)
+def new_game(db: Session = Depends(get_db)):
     """
     This returns you a new board url
     """
+    board = Board()
+    db.add(board)
+    db.commit()
+    db.refresh(board)
     return {
-        'board_url': '/board/10'
+        'board_url': f'/board/{board.id}'
     }
 
 

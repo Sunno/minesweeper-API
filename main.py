@@ -1,4 +1,4 @@
-from fastapi import FastAPI, status, Depends
+from fastapi import FastAPI, status, Depends, HTTPException
 from sqlalchemy.orm import Session
 
 from models import Base, Board, Tile
@@ -36,14 +36,17 @@ def new_game(db: Session = Depends(get_db)):
 
 
 @app.get('/board/{board_id}', response_model=BoardSchema)
-def get_board(board_id: int):
+def get_board(board_id: int, db: Session = Depends(get_db)):
     """
     Returns current board status
     """
-    return {
-        'status': 'playing',  # playing | won | lost
-        'grid': []
-    }
+    board = db.query(Board).get(board_id)
+    if not board:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail='Board does not exist'
+        )
+    return board
 
 
 @app.post('/board/{board_id}/tile',

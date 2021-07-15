@@ -3,7 +3,7 @@ from sqlalchemy.orm import Session
 
 from models import Base, Board, Tile
 from database import engine, get_db
-from schemas import TileSchema
+from schemas import TileSchema, BoardSchema
 
 app = FastAPI()
 Base.metadata.create_all(engine)
@@ -19,21 +19,23 @@ def index():
     }
 
 
-@app.post('/init', status_code=status.HTTP_201_CREATED)
+@app.post('/init',
+          status_code=status.HTTP_201_CREATED,
+          response_model=BoardSchema)
 def new_game(db: Session = Depends(get_db)):
     """
     This returns you a new board url
     """
-    board = Board()
+    board = Board(status='playing')
     db.add(board)
     db.commit()
     db.refresh(board)
-    return {
-        'board_url': f'/board/{board.id}'
-    }
+    board.put_mines(db)
+    board.generate_grid(db)
+    return board
 
 
-@app.get('/board/{board_id}')
+@app.get('/board/{board_id}', response_model=BoardSchema)
 def get_board(board_id: int):
     """
     Returns current board status
@@ -44,9 +46,12 @@ def get_board(board_id: int):
     }
 
 
-@app.post('/board/{board_id}/tile', status_code=status.HTTP_201_CREATED)
+@app.post('/board/{board_id}/tile',
+          status_code=status.HTTP_201_CREATED,
+          response_model=BoardSchema)
 def select_tile(board_id: int,
-                tile_data: TileSchema, db: Session = Depends(get_db)):
+                tile_data: TileSchema,
+                db: Session = Depends(get_db)):
     '''
     Selects a tile and sees if it selectes a mine
     Returns the current status of the board

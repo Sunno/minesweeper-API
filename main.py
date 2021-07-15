@@ -46,6 +46,7 @@ def get_board(board_id: int, db: Session = Depends(get_db)):
             status_code=status.HTTP_404_NOT_FOUND,
             detail='Board does not exist'
         )
+    board.generate_grid(db)
     return board
 
 
@@ -59,14 +60,38 @@ def select_tile(board_id: int,
     Selects a tile and sees if it selectes a mine
     Returns the current status of the board
     '''
-    board = db.query(Board).filter(Board.id == board_id).first()
+    board = db.query(Board).get(board_id)
+    if not board:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail='Board does not exist'
+        )
+
+    if board.status != 'playing':
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail='This board is not available to play'
+        )
+
+    existing_tile = db.query(Tile).filter(
+        Tile.board_id == board_id,
+        Tile.position == tile_data.position
+    ).first()
+
+    if existing_tile and existing_tile.is_a_mine:
+        board.status = 'lost'
+        tile = Tile(**tile_data.dict())
+        tile.board = board
+        db.add(tile)
+        db.commit()
+        board.generate_grid(db, True)
+        return board
+
     tile = Tile(**tile_data.dict())
     tile.board = board
     db.add(tile)
     db.commit()
     db.refresh(tile)
-    return {
-        'status': 'playing',  # playing | won | lost
-        'tile': tile,
-        'grid': []
-    }
+
+    board.generate_grid(db)
+    return board

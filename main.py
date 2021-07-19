@@ -3,7 +3,7 @@ from sqlalchemy.orm import Session
 
 from models import Base, Board, Tile
 from database import engine, get_db
-from schemas import TileSchema, BoardSchema
+from schemas import TileSchema, BoardSchemaResponse, BoardSchema
 
 app = FastAPI()
 Base.metadata.create_all(engine)
@@ -21,12 +21,15 @@ def index():
 
 @app.post('/init',
           status_code=status.HTTP_201_CREATED,
-          response_model=BoardSchema)
-def new_game(db: Session = Depends(get_db)):
+          response_model=BoardSchemaResponse)
+def new_game(board_data: BoardSchema, db: Session = Depends(get_db)):
     """
     This returns you a new board url
     """
-    board = Board(status='playing')
+    grid_size = board_data.grid_size * board_data.grid_size
+    board = Board(
+        status='playing',
+        grid_size=grid_size, mines_number=board_data.mines_number)
     db.add(board)
     db.commit()
     db.refresh(board)
@@ -35,7 +38,7 @@ def new_game(db: Session = Depends(get_db)):
     return board
 
 
-@app.get('/board/{board_id}', response_model=BoardSchema)
+@app.get('/board/{board_id}', response_model=BoardSchemaResponse)
 def get_board(board_id: int, db: Session = Depends(get_db)):
     """
     Returns current board status
@@ -52,7 +55,7 @@ def get_board(board_id: int, db: Session = Depends(get_db)):
 
 @app.post('/board/{board_id}/tile',
           status_code=status.HTTP_201_CREATED,
-          response_model=BoardSchema)
+          response_model=BoardSchemaResponse)
 def select_tile(board_id: int,
                 tile_data: TileSchema,
                 db: Session = Depends(get_db)):

@@ -2,7 +2,7 @@ from random import randint
 from sqlalchemy import Column, Integer, Boolean, ForeignKey, String
 from sqlalchemy.orm import relationship, Session
 from database import Base
-from settings import GRID_SIZE, GRID_HEIGHT, GRID_WIDTH, MINES_RATE
+from settings import GRID_SIZE, MINES_RATE
 
 
 class Board(Base):
@@ -11,6 +11,8 @@ class Board(Base):
     id = Column(Integer, primary_key=True, index=True)
     tiles = relationship('Tile', back_populates='board')
     status = Column(String)
+    grid_size = Column(Integer, default=GRID_SIZE)
+    mines_number = Column(Integer, default=int(GRID_SIZE * MINES_RATE))
 
     def generate_grid(self, db, paint_mines=False):
         checked_tiles = db.query(Tile.position).filter(
@@ -26,7 +28,7 @@ class Board(Base):
         mine_tiles = [m[0] for m in mine_tiles]
 
         arr = []
-        for idx in range(GRID_SIZE):
+        for idx in range(self.grid_size):
             if idx in checked_tiles:
                 if idx in mine_tiles:
                     arr.append('*')
@@ -42,21 +44,16 @@ class Board(Base):
     def url(self):
         return f'/board/{self.id}'
 
-    @property
-    def grid_size(self):
-        return GRID_WIDTH, GRID_HEIGHT
-
     def put_mines(self, db: Session):
-        mine_number = int(GRID_SIZE * MINES_RATE)
-        for _ in range(mine_number):
-            position = randint(0, GRID_SIZE - 1)
+        for _ in range(self.mines_number):
+            position = randint(0, self.grid_size - 1)
             existing_tile = db.query(Tile).filter(
                 Tile.board_id == self.id,
                 Tile.position == position
             )
             # In case it's already assigned
             while not existing_tile:
-                position = randint(0, GRID_SIZE - 1)
+                position = randint(0, self.grid_size - 1)
                 existing_tile = db.query(Tile).filter(
                     Tile.board_id == self.id,
                     Tile.position == position

@@ -14,7 +14,13 @@ class Board(Base):
     grid_size = Column(Integer, default=GRID_SIZE)
     mines_number = Column(Integer, default=int(GRID_SIZE * MINES_RATE))
 
-    def generate_grid(self, db, paint_mines=False):
+    @property
+    def grid(self):
+        return self._grid
+        return [0 if self.status == 'playing' and t == 'm' else t
+                for t in self._grid]
+
+    def generate_grid(self, db):
         checked_tiles = db.query(Tile.position).filter(
             Tile.board_id == self.id, Tile.is_a_mine.is_(False)
         ).all()
@@ -34,15 +40,21 @@ class Board(Base):
                     arr.append('*')
                 else:
                     arr.append('v')
-            elif paint_mines and idx in mine_tiles:
+            elif idx in mine_tiles:
                 arr.append('m')
             else:
                 arr.append(0)  # TODO calculate the coordinates of mines
-        self.grid = arr
+        self._grid = arr
 
     @property
     def url(self):
         return f'/board/{self.id}'
+
+    def update_status(self):
+        if 0 not in self._grid:
+            self.status = 'won'
+        elif '*' in self._grid:
+            self.status = 'lost'
 
     def put_mines(self, db: Session):
         for _ in range(self.mines_number):

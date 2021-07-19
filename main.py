@@ -76,18 +76,19 @@ def select_tile(board_id: int,
             detail='This board is not available to play'
         )
 
+    if tile_data.position >= board.grid_size:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail='Position cannot be greater than the board size'
+        )
+
     existing_tile = db.query(Tile).filter(
         Tile.board_id == board_id,
         Tile.position == tile_data.position
     ).first()
 
-    if existing_tile and existing_tile.is_a_mine:
-        board.status = 'lost'
-        tile = Tile(**tile_data.dict())
-        tile.board = board
-        db.add(tile)
-        db.commit()
-        board.generate_grid(db, True)
+    if existing_tile and not existing_tile.is_a_mine:
+        board.generate_grid(db)
         return board
 
     tile = Tile(**tile_data.dict())
@@ -97,4 +98,6 @@ def select_tile(board_id: int,
     db.refresh(tile)
 
     board.generate_grid(db)
+    board.update_status()
+    db.commit()
     return board

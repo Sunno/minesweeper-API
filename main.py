@@ -75,7 +75,7 @@ def select_tile(board_id: int,
             detail='This board is not available to play'
         )
 
-    if tile_data.position >= board.grid_size:
+    if tile_data.position >= board.grid_length:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail='Position cannot be greater than the board size'

@@ -26,10 +26,9 @@ def new_game(board_data: BoardSchema, db: Session = Depends(get_db)):
     """
     This returns you a new board url
     """
-    grid_size = board_data.grid_size * board_data.grid_size
     board = Board(
         status='playing',
-        grid_size=grid_size, mines_number=board_data.mines_number)
+        **board_data.dict())
     db.add(board)
     db.commit()
     db.refresh(board)
@@ -98,6 +97,7 @@ def select_tile(board_id: int,
     db.refresh(tile)
 
     board.generate_grid(db)
+    tile.expand_tile(db)
     board.update_status()
     db.commit()
     return board

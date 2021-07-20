@@ -1,7 +1,7 @@
 {
     "_meta": {
         "hash": {
-            "sha256": "d1c384aea8856e34afeb99b083f1cb6530078a66b913d2412d07b545a9906ecd"
+            "sha256": "2a3e3aaab319332ee785672413f311fdd1f5f1eebf2220fe4b8ec765bb8e85df"
         },
         "pipfile-spec": 6,
         "requires": {
@@ -34,11 +34,11 @@
         },
         "fastapi": {
             "hashes": [
-                "sha256:6ea4225448786f3d6fae737713789f87631a7455f65580de0a4a2e50471060d9",
-                "sha256:85d8aee8c3c46171f4cb7bb3651425a42c07cb9183345d100ef55d88ca2ce15f"
+                "sha256:1ac66c0635301bbd99785fb825300064d54adb774e8a5562661901de14ce6560",
+                "sha256:958ed7341f97292e2fc3e6401830bbe203a917af93cd10bb6392be170ad3c15f"
             ],
             "index": "pypi",
-            "version": "==0.66.0"
+            "version": "==0.66.1"
         },
         "greenlet": {
             "hashes": [
@@ -122,6 +122,21 @@
                 "sha256:fd3b8905e21431ad306eeaf56644a68fdd621bf8f3097eff54d0f6bdf7262065"
             ],
             "version": "==0.2.0"
+        },
+        "psycopg2": {
+            "hashes": [
+                "sha256:079d97fc22de90da1d370c90583659a9f9a6ee4007355f5825e5f1c70dffc1fa",
+                "sha256:2087013c159a73e09713294a44d0c8008204d06326006b7f652bef5ace66eebb",
+                "sha256:2c992196719fadda59f72d44603ee1a2fdcc67de097eea38d41c7ad9ad246e62",
+                "sha256:7640e1e4d72444ef012e275e7b53204d7fab341fb22bc76057ede22fe6860b25",
+                "sha256:7f91312f065df517187134cce8e395ab37f5b601a42446bdc0f0d51773621854",
+                "sha256:830c8e8dddab6b6716a4bf73a09910c7954a92f40cf1d1e702fb93c8a919cc56",
+                "sha256:89409d369f4882c47f7ea20c42c5046879ce22c1e4ea20ef3b00a4dfc0a7f188",
+                "sha256:bf35a25f1aaa8a3781195595577fcbb59934856ee46b4f252f56ad12b8043bcf",
+                "sha256:de5303a6f1d0a7a34b9d40e4d3bef684ccc44a49bbe3eb85e3c0bffb4a131b7c"
+            ],
+            "index": "pypi",
+            "version": "==2.9.1"
         },
         "pydantic": {
             "hashes": [

@@ -1,5 +1,8 @@
 from fastapi import FastAPI, status, Depends, HTTPException
+from fastapi.responses import HTMLResponse
 from sqlalchemy.orm import Session
+
+from gh_md_to_html import core_converter
 
 from models import Base, Board, Tile
 from database import engine, get_db
@@ -9,14 +12,17 @@ app = FastAPI()
 Base.metadata.create_all(engine)
 
 
-@app.get('/')
+@app.get('/', response_class=HTMLResponse)
 def index():
     '''
     Just a welcome message :)
     '''
-    return {
-        'Welcome': 'Please refer to the docs to know how to play'
-    }
+    with open('./README.md') as readme:
+        content = core_converter.markdown(
+            readme.read()
+        )
+
+    return content
 
 
 @app.post('/init',

@@ -8,10 +8,13 @@ fastapi = "*"
 uvicorn = {extras = ["standard"], version = "*"}
 sqlalchemy = "*"
 psycopg2 = "*"
+gh-md-to-html = "*"
+mistune = "==2.0.0rc1"
 
 [dev-packages]
 jedi = "*"
 flake8 = "*"
+ipdb = "*"
 
 [requires]
 python_version = "3.8"

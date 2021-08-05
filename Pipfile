@@ -10,6 +10,7 @@ sqlalchemy = "*"
 psycopg2 = "*"
 gh-md-to-html = "*"
 mistune = "==2.0.0rc1"
+pygments = "==2.9.0"
 
 [dev-packages]
 jedi = "*"
